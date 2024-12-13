@@ -26,33 +26,78 @@ public class student extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Boolean studentFound=false;
         String id=req.getParameter("id");
         String name=req.getParameter("name");
         String age=req.getParameter("age");
         String address=req.getParameter("address");
 
-        int student_id=Integer.parseInt(id);
-        int student_age=Integer.parseInt(age);
+        for (studentDTO dto : list) {
+            if(dto.getId()==Integer.parseInt(id)){
+               studentFound=true;
+               break;
+            }
+        }
 
-        studentDTO studentDTO=new studentDTO();
-        studentDTO.setId(student_id);
-        studentDTO.setName(name);
-        studentDTO.setAddress(address);
-        studentDTO.setAge(student_age);
+        if(!studentFound){
+            int student_id=Integer.parseInt(id);
+            int student_age=Integer.parseInt(age);
 
-        boolean isAdded =list.add(studentDTO);
+            studentDTO studentDTO=new studentDTO();
+            studentDTO.setId(student_id);
+            studentDTO.setName(name);
+            studentDTO.setAddress(address);
+            studentDTO.setAge(student_age);
 
-        resp.getWriter().println("student added "+isAdded);
+            boolean isAdded =list.add(studentDTO);
+
+            resp.getWriter().println("student added "+isAdded);
+        }
+        else{
+            resp.getWriter().println("student found with same ID,can't add");
+        }
 
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doDelete(req, resp);
+        Boolean deleted=false;
+        int id=Integer.parseInt(req.getParameter("id"));
+        for (studentDTO dto : list) {
+            if(dto.getId()==id){
+                deleted=true;
+                list.remove(dto);
+                break;
+            }
+        }
+        if(deleted){
+            resp.getWriter().println("student deleted");
+        }
+        else{
+            resp.getWriter().println("student not found");
+        }
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPut(req, resp);
+        Boolean studentFound=false;
+        int id=Integer.parseInt(req.getParameter("id"));
+
+        for (studentDTO dto : list) {
+            if(dto.getId()==id){
+                studentFound=true;
+
+                String name=req.getParameter("name");
+                int age=Integer.parseInt(req.getParameter("age"));
+                String address=req.getParameter("address");
+
+                dto.setName(name);
+                dto.setAge(age);
+                dto.setAddress(address);
+                break;
+            }
+        }
+        String result=studentFound?"Student details updated successfully":"Student not found, update failed";
+        resp.getWriter().write(result);
     }
 }
