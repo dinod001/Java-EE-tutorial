@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: #ffffff;
+            border: 2px solid #007BFF;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px 30px;
+            width: 300px;
+        }
+        .form-container h2 {
+            text-align: center;
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group input:focus {
+            border-color: #007BFF;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+        }
+        .button-group button {
+            background-color: #007BFF;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+        .button-group button:active {
+            background-color: #003f7f;
+        }
+        .button-group button.delete {
+            background-color: #dc3545;
+        }
+        .button-group button.delete:hover {
+            background-color: #b02a37;
+        }
+        .button-group button.delete:active {
+            background-color: #7a1d28;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Manage User</h2>
+        <form>
+            <div class="form-group">
+                <label for="id">ID</label>
+                <input type="text" id="id" name="id" required>
+            </div>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" name="age" required>
+            </div>
+            <div class="button-group">
+                <button type="button" class="save" id="save">Save</button>
+                <button type="button" class="update">Update</button>
+                <button type="button" class="find" id="find">Find</button>
+                <button type="button" class="delete">Delete</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.getElementById("save").onclick=function(){
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+                const raw = JSON.stringify({
+                "id": document.getElementById("id").value,
+                "name": document.getElementById("name").value,
+                "age": document.getElementById("age").value
+                });
+
+                const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow"
+                };
+
+                fetch("http://localhost:8080/student", requestOptions)
+                .then((response) => response.text())
+                .then((result) => {
+                    if(result.trim()=="Successfully added student"){
+                        window.alert("Successfully added student");
+                        console.log(result);
+                    }
+                    else{
+                        window.alert("student added failed");
+                        console.log(result);
+                    }
+                }
+            )
+                .catch((error) => console.error(error));  
+             }
+
+
+        document.getElementById("find").onclick=function(){
+            const raw = "";
+
+            const requestOptions = {
+            method: "POST",
+            body: raw,
+            redirect: "follow"
+            };
+
+            const id=document.getElementById("id").value;
+            fetch(`http://localhost:8080/student?id=${id}`, requestOptions)
+            .then((response) => response.text())
+            .then((result) => {
+                console.log(result);
+                if(result.trim()!="Student not found"){
+                    const parsedResult = JSON.parse(result);
+                    document.getElementById("name").value=parsedResult.name;
+                    document.getElementById("age").value=parsedResult.age;
+                }
+                else{
+                    window.alert(result);
+                    document.getElementById("id").value="";
+                    document.getElementById("name").value="";
+                    document.getElementById("age").value="";
+                }
+                
+            })
+            .catch((error) => console.error(error));
+        }
+
+    </script>
+</body>
+</html>
